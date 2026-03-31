@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gửi Người Thương ❤️</title>
+    <style>
+        :root {
+            --primary-color: #ff4d6d;
+            --secondary-color: #ff85a1;
+            --bg-gradient: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-gradient);
+            font-family: 'Segoe UI', cursive, sans-serif;
+            overflow: hidden;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(255, 77, 109, 0.2);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            border: 5px solid white;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Phần chữ xin lỗi - có thể giữ nguyên nếu bạn thấy ổn, nhưng mình tối ưu lại cho mượt */
+        h1 { color: var(--primary-color); font-size: 2rem; margin-bottom: 15px; }
+        p { color: #666; font-size: 1.1rem; line-height: 1.5; }
+
+        /* ĐÂY LÀ PHẦN SỬA CHÍNH ĐỂ CĂN GIỮA HAI NÚT */
+        .btn-container {
+            margin-top: 40px;
+            height: 60px; /* Tăng độ cao một chút để có chỗ cho nút chạy */
+            position: relative;
+            display: flex; /* Dùng flexbox */
+            justify-content: center; /* Căn giữa theo chiều ngang */
+            align-items: center; /* Căn giữa theo chiều dọc */
+            gap: 20px; /* Tạo khoảng cách giữa hai nút */
+        }
+
+        button {
+            padding: 12px 35px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative; /* Đặt là relative để làm gốc cho position fixed */
+        }
+
+        #yesBtn {
+            background: var(--primary-color);
+            color: white;
+            z-index: 11; /* Đảm bảo nút này luôn nổi lên */
+        }
+
+        #yesBtn:hover { 
+            transform: scale(1.1); 
+            box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4); 
+        }
+
+        /* Nút "Hổng bé" được thiết kế lại để ẩn đi khi 'bỏ chạy' */
+        #noBtn {
+            background: #eee;
+            color: #777;
+            white-space: nowrap; /* Giữ chữ trên một dòng */
+            z-index: 11; /* Đảm bảo nút này luôn nổi lên */
+        }
+
+        /* Hiệu ứng pháo hoa vẫn giữ nguyên */
+        canvas { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            pointer-events: none; 
+            z-index: 1; /* Pháo hoa bay phía sau thẻ card */
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="fireworks"></canvas>
+
+    <div class="card" id="mainCard">
+        <div id="content">
+            <h1 id="title">Đừng giận mình nữa nhé? 🥺</h1>
+            <p id="desc">Mình biết mình sai rồi, hứa từ nay sẽ ngoan và nghe lời bạn nhất luôn!</p>
+            
+            <div class="btn-container">
+                <button id="yesBtn" onclick="celebrate()">Tha lỗi nè ❤️</button>
+                <button id="noBtn" onmouseover="moveNoBtn()">Hổng bé ơi 😤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        // SỬA LẠI HÀM NÀY ĐỂ NÚT CHẠY MƯỢT VÀ Ở TRONG MÀN HÌNH HƠN
+        function moveNoBtn() {
+            const btn = document.getElementById('noBtn');
+            const container = document.querySelector('.btn-container');
+            
+            // Lấy kích thước màn hình để không cho nút chạy ra ngoài
+            const viewWidth = window.innerWidth;
+            const viewHeight = window.innerHeight;
+            const btnWidth = btn.offsetWidth;
+            const btnHeight = btn.offsetHeight;
+
+            // Tính toán vị trí ngẫu nhiên mới, nhưng vẫn đảm bảo nút không bị mất
+            const newX = Math.random() * (viewWidth - btnWidth - 40) + 20; // Lề 20px
+            const newY = Math.random() * (viewHeight - btnHeight - 40) + 20; // Lề 20px
+
+            // Áp dụng vị trí mới
+            btn.style.position = 'fixed'; // Chuyển sang fixed để nó 'thoát' khỏi flexbox
+            btn.style.left = newX + 'px';
+            btn.style.top = newY + 'px';
+            
+            // Bổ sung: Khi nút di chuyển, đảm bảo nút OK vẫn ở giữa bằng cách reset container
+            container.style.justifyContent = 'center';
+            container.style.gap = '0'; // Giảm gap vì chỉ còn 1 nút trong container
+        }
+
+        function celebrate() {
+            // Thay đổi nội dung
+            document.getElementById('title').innerText = "Hết giận rồi nha! 🥰";
+            document.getElementById('desc').innerHTML = "Cảm ơn bạn iu đã rộng lượng tha thứ.<br>Tối nay mình đi ăn món bạn thích nhé!";
+            
+            // Ẩn toàn bộ vùng chứa nút
+            document.querySelector('.btn-container').style.display = 'none';
+
+            // Kích hoạt pháo hoa
+            triggerFireworks();
+        }
+
+        function triggerFireworks() {
+            var duration = 5 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+              return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+              var timeLeft = animationEnd - Date.now();
+
+              if (timeLeft <= 0) {
+                return clearInterval(interval);
+              }
+
+              var particleCount = 50 * (timeLeft / duration);
+              // Pháo hoa bên trái
+              confetti(Object.assign({}, defaults, { 
+                  particleCount, 
+                  origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                  colors: ['#ff4d6d', '#ff85a1', '#ffb3c1']
+              }));
+              // Pháo hoa bên phải
+              confetti(Object.assign({}, defaults, { 
+                  particleCount, 
+                  origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                  colors: ['#ff4d6d', '#ff85a1', '#ffb3c1']
+              }));
+            }, 250);
+        }
+    </script>
+</body>
+</html>
